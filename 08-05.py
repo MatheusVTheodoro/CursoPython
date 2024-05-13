@@ -19,7 +19,7 @@ class CarroView:
         print(f"Marca: {carro.marca}, Modelo: {carro.modelo}, Ano: {carro.ano}, Velocidade: {carro.velocidade}")
 
 
-# Controlador
+# Controlador 
 class CarroController:
     def __init__(self, carro, view):
         self.carro = carro
@@ -35,6 +35,7 @@ class CarroController:
 
 
 # Criando uma instância da classe Carro
+
 meu_carro = Carro("Toyota", "Corolla", 2022)
 
 # Criando uma instância da classe CarroView
