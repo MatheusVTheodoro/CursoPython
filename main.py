@@ -179,7 +179,7 @@ lista_tickets.pack()
 scrollbar.config(command=lista_tickets.yview)
 
 # Atualiza a lista de tickets na inicialização
-atualizar_lista_tickets()
+atualizar_lista_tickets()   
 
 # Associa a função exibir_descricao_ticket ao evento de clicar em um item da lista
 lista_tickets.bind("<<ListboxSelect>>", exibir_descricao_ticket)
