@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 from openpyxl import Workbook, load_workbook
 from datetime import datetime
-
+import babel.numbers
 class Ticket:
     def __init__(self, cliente, problema, prioridade, data_hora):
         self.cliente = cliente
