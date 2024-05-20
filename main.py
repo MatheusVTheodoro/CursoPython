@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 from openpyxl import Workbook, load_workbook
 from datetime import datetime
-import babel.numbers
+
 class Ticket:
     def __init__(self, cliente, problema, prioridade, data_hora):
         self.cliente = cliente
@@ -17,7 +17,7 @@ def adicionar_ticket():
     cliente = entry_cliente.get()
     problema = entry_problema.get("1.0", tk.END)  # Obtemos todo o texto do campo de texto
     prioridade = combo_prioridade.get()
-    data_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Data e hora atual
+    data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")  # Data e hora atual no formato dia/mês/ano
 
     if cliente and problema.strip() and prioridade:
         novo_ticket = Ticket(cliente, problema, prioridade, data_hora)
@@ -36,12 +36,12 @@ def atualizar_lista_tickets():
 
 # Função para filtrar os tickets por data
 def filtrar_tickets():
-    data_inicio = cal_data_inicio.get_date()
-    data_fim = cal_data_fim.get_date()
+    data_inicio = datetime.strptime(cal_data_inicio.get(), "%d/%m/%Y")
+    data_fim = datetime.strptime(cal_data_fim.get(), "%d/%m/%Y")
     lista_tickets.delete(0, tk.END)
     for i, ticket in enumerate(tickets):
-        data_ticket = datetime.strptime(ticket.data_hora, "%Y-%m-%d %H:%M:%S")
-        if data_inicio <= data_ticket.date() <= data_fim:
+        data_ticket = datetime.strptime(ticket.data_hora, "%d/%m/%Y %H:%M:%S")
+        if data_inicio <= data_ticket <= data_fim:
             lista_tickets.insert(tk.END, f"Ticket {i+1}: Cliente: {ticket.cliente} | Prioridade: {ticket.prioridade} | Data/Hora: {ticket.data_hora}")
 
 # Função para limpar os campos de entrada após adicionar um novo ticket
@@ -152,12 +152,12 @@ frame_filtro.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
 label_data_inicio = ttk.Label(frame_filtro, text="Data Início:")
 label_data_inicio.grid(row=0, column=0, padx=5, pady=5)
-cal_data_inicio = DateEntry(frame_filtro, width=12, background='darkblue', foreground='white', borderwidth=2)
+cal_data_inicio = DateEntry(frame_filtro, width=12, background='darkblue', foreground='white', borderwidth=2, date_pattern='dd/MM/yyyy')
 cal_data_inicio.grid(row=0, column=1, padx=5, pady=5)
 
 label_data_fim = ttk.Label(frame_filtro, text="Data Fim:")
 label_data_fim.grid(row=1, column=0, padx=5, pady=5)
-cal_data_fim = DateEntry(frame_filtro, width=12, background='darkblue', foreground='white', borderwidth=2)
+cal_data_fim = DateEntry(frame_filtro, width=12, background='darkblue', foreground='white', borderwidth=2, date_pattern='dd/MM/yyyy')
 cal_data_fim.grid(row=1, column=1, padx=5, pady=5)
 
 btn_filtrar = ttk.Button(frame_filtro, text="Filtrar", command=filtrar_tickets)
@@ -179,7 +179,7 @@ lista_tickets.pack()
 scrollbar.config(command=lista_tickets.yview)
 
 # Atualiza a lista de tickets na inicialização
-atualizar_lista_tickets()   
+atualizar_lista_tickets()
 
 # Associa a função exibir_descricao_ticket ao evento de clicar em um item da lista
 lista_tickets.bind("<<ListboxSelect>>", exibir_descricao_ticket)
