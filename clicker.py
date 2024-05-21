@@ -6,21 +6,21 @@ class ClickerGame:
         self.root = root
         self.root.title("Clicker Game")
         
-        self.score = 0
+        self.batatas = 0
         self.multiplier = 1
         self.auto_clickers = 0
         
         # Interface
-        self.score_label = ttk.Label(root, text="Score: 0")
-        self.score_label.pack()
+        self.batatas_label = ttk.Label(root, text="Batatas: 0")
+        self.batatas_label.pack()
 
-        self.click_button = ttk.Button(root, text="Click me!", command=self.click)
+        self.click_button = ttk.Button(root, text="Clique em mim!", command=self.click)
         self.click_button.pack()
 
-        self.upgrade_button = ttk.Button(root, text="Buy Multiplier (Cost: 10)", command=self.buy_multiplier)
+        self.upgrade_button = ttk.Button(root, text="Comprar Multiplicador (Custo: 10)", command=self.buy_multiplier)
         self.upgrade_button.pack()
 
-        self.auto_clicker_button = ttk.Button(root, text="Buy Auto Clicker (Cost: 50)", command=self.buy_auto_clicker)
+        self.auto_clicker_button = ttk.Button(root, text="Comprar Auto Clicker (Custo: 50)", command=self.buy_auto_clicker)
         self.auto_clicker_button.pack()
 
         self.progress_bar = ttk.Progressbar(root, length=200, mode='determinate')
@@ -31,39 +31,35 @@ class ClickerGame:
         self.auto_click()
 
     def click(self):
-        self.score += self.multiplier
-        self.update_score()
+        self.batatas += self.multiplier
+        self.update_batatas()
 
     def buy_multiplier(self):
-        if self.score >= 10:
-            self.score -= 10
+        if self.batatas >= 10:
+            self.batatas -= 10
             self.multiplier += 1
-            self.update_score()
+            self.update_batatas()
 
     def buy_auto_clicker(self):
-        if self.score >= 50:
-            self.score -= 50
+        if self.batatas >= 50:
+            self.batatas -= 50
             self.auto_clickers += 1
-            self.update_score()
+            self.update_batatas()
 
     def auto_click(self):
         if self.auto_clickers > 0:
-            self.score += self.auto_clickers * self.multiplier
-            self.update_score()
-        
-        # Atualiza a barra de progresso
-        self.progress_bar['value'] += self.auto_clickers
-        if self.progress_bar['value'] >= 100:
-            self.progress_bar['value'] = 0
-            self.score += 10 * self.auto_clickers * self.multiplier
-            self.update_score()
+            self.progress_bar['value'] += 10
+            if self.progress_bar['value'] >= 100:
+                self.progress_bar['value'] = 0
+                self.batatas += self.auto_clickers * self.multiplier
+                self.update_batatas()
         
         self.root.after(1000, self.auto_click)
 
-    def update_score(self):
-        self.score_label.config(text=f"Score: {self.score}")
-        self.upgrade_button.config(text=f"Buy Multiplier (Cost: 10)")
-        self.auto_clicker_button.config(text=f"Buy Auto Clicker (Cost: 50)")
+    def update_batatas(self):
+        self.batatas_label.config(text=f"Batatas: {self.batatas}")
+        self.upgrade_button.config(text=f"Comprar Multiplicador (Custo: 10)")
+        self.auto_clicker_button.config(text=f"Comprar Auto Clicker (Custo: 50)")
 
 if __name__ == "__main__":
     root = tk.Tk()
