@@ -14,6 +14,9 @@ class ClickerGame:
         self.batatas_label = ttk.Label(root, text="Batatas: 0")
         self.batatas_label.pack()
 
+        self.beterrabas_label = ttk.Label(root, text="beterrabas: 0")
+        self.beterrabas_label.pack()
+
         self.click_button = ttk.Button(root, text="Clique em mim!", command=self.click)
         self.click_button.pack()
 
