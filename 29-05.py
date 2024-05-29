@@ -1,5 +1,8 @@
 import pandas as pd
 import os
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import simpledialog
 
 # Nome do arquivo Excel
 FILENAME = 'clientes.xlsx'
@@ -11,67 +14,112 @@ if not os.path.exists(FILENAME):
 
 def listar_clientes():
     df = pd.read_excel(FILENAME)
-    if df.empty:
-        print("Nenhum cliente cadastrado.")
-    else:
-        print(df)
+    return df
 
 def adicionar_cliente(nome, telefone):
     df = pd.read_excel(FILENAME)
     novo_cliente = pd.DataFrame({'Nome': [nome], 'Telefone': [telefone]})
     df = pd.concat([df, novo_cliente], ignore_index=True)
     df.to_excel(FILENAME, index=False)
-    print(f"Cliente {nome} adicionado com sucesso!")
 
 def editar_cliente(indice, nome, telefone):
     df = pd.read_excel(FILENAME)
     if indice < 0 or indice >= len(df):
-        print("Índice inválido.")
+        return False
     else:
         df.at[indice, 'Nome'] = nome
         df.at[indice, 'Telefone'] = telefone
         df.to_excel(FILENAME, index=False)
-        print(f"Cliente no índice {indice} atualizado com sucesso!")
+        return True
 
 def deletar_cliente(indice):
     df = pd.read_excel(FILENAME)
     if indice < 0 or indice >= len(df):
-        print("Índice inválido.")
+        return False
     else:
         df = df.drop(index=indice)
         df.to_excel(FILENAME, index=False)
-        print(f"Cliente no índice {indice} deletado com sucesso!")
+        return True
 
-def menu():
-    while True:
-        print("\nMenu:")
-        print("1. Listar clientes")
-        print("2. Adicionar cliente")
-        print("3. Editar cliente")
-        print("4. Deletar cliente")
-        print("5. Sair")
-        escolha = input("Escolha uma opção: ")
+class App:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Cadastro de Clientes")
 
-        if escolha == '1':
-            listar_clientes()
-        elif escolha == '2':
-            nome = input("Nome do cliente: ")
-            telefone = input("Telefone do cliente: ")
+        self.frame = tk.Frame(self.root)
+        self.frame.pack(pady=10)
+
+        self.label_nome = tk.Label(self.frame, text="Nome")
+        self.label_nome.grid(row=0, column=0)
+
+        self.entry_nome = tk.Entry(self.frame)
+        self.entry_nome.grid(row=0, column=1)
+
+        self.label_telefone = tk.Label(self.frame, text="Telefone")
+        self.label_telefone.grid(row=1, column=0)
+
+        self.entry_telefone = tk.Entry(self.frame)
+        self.entry_telefone.grid(row=1, column=1)
+
+        self.btn_adicionar = tk.Button(self.frame, text="Adicionar Cliente", command=self.adicionar_cliente)
+        self.btn_adicionar.grid(row=2, columnspan=2, pady=10)
+
+        self.lista_clientes = tk.Listbox(self.root)
+        self.lista_clientes.pack(pady=10)
+
+        self.btn_editar = tk.Button(self.root, text="Editar Cliente", command=self.editar_cliente)
+        self.btn_editar.pack(pady=5)
+
+        self.btn_deletar = tk.Button(self.root, text="Deletar Cliente", command=self.deletar_cliente)
+        self.btn_deletar.pack(pady=5)
+
+        self.atualizar_lista()
+
+    def atualizar_lista(self):
+        self.lista_clientes.delete(0, tk.END)
+        df = listar_clientes()
+        for idx, row in df.iterrows():
+            self.lista_clientes.insert(tk.END, f"{idx}: {row['Nome']} - {row['Telefone']}")
+
+    def adicionar_cliente(self):
+        nome = self.entry_nome.get()
+        telefone = self.entry_telefone.get()
+        if nome and telefone:
             adicionar_cliente(nome, telefone)
-        elif escolha == '3':
-            listar_clientes()
-            indice = int(input("Índice do cliente a ser editado: "))
-            nome = input("Novo nome do cliente: ")
-            telefone = input("Novo telefone do cliente: ")
-            editar_cliente(indice, nome, telefone)
-        elif escolha == '4':
-            listar_clientes()
-            indice = int(input("Índice do cliente a ser deletado: "))
-            deletar_cliente(indice)
-        elif escolha == '5':
-            break
+            self.entry_nome.delete(0, tk.END)
+            self.entry_telefone.delete(0, tk.END)
+            self.atualizar_lista()
         else:
-            print("Opção inválida. Tente novamente.")
+            messagebox.showerror("Erro", "Nome e telefone são obrigatórios")
+
+    def editar_cliente(self):
+        selected = self.lista_clientes.curselection()
+        if selected:
+            indice = int(selected[0])
+            nome = simpledialog.askstring("Editar Cliente", "Novo Nome:", initialvalue=self.lista_clientes.get(selected).split(': ')[1].split(' - ')[0])
+            telefone = simpledialog.askstring("Editar Cliente", "Novo Telefone:", initialvalue=self.lista_clientes.get(selected).split(': ')[1].split(' - ')[1])
+            if nome and telefone:
+                if editar_cliente(indice, nome, telefone):
+                    self.atualizar_lista()
+                else:
+                    messagebox.showerror("Erro", "Índice inválido")
+            else:
+                messagebox.showerror("Erro", "Nome e telefone são obrigatórios")
+        else:
+            messagebox.showerror("Erro", "Nenhum cliente selecionado")
+
+    def deletar_cliente(self):
+        selected = self.lista_clientes.curselection()
+        if selected:
+            indice = int(selected[0])
+            if deletar_cliente(indice):
+                self.atualizar_lista()
+            else:
+                messagebox.showerror("Erro", "Índice inválido")
+        else:
+            messagebox.showerror("Erro", "Nenhum cliente selecionado")
 
 if __name__ == "__main__":
-    menu()
+    root = tk.Tk()
+    app = App(root)
+    root.mainloop()
